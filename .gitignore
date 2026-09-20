@@ -12,6 +12,7 @@ cmake-build-release/
 cmake-build-minisizerel/
 cmake-build-debug/
 resources/
+docs/
 .idea
 
 # Compiled Object files
@@ -47,4 +48,3 @@ resources/
 # Text
 *.md
 *.asc
-

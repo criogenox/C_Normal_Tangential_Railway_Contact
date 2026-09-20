@@ -1,68 +1,41 @@
-cmake_minimum_required(VERSION 3.28)
-project(FastSim VERSION 1.0.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 4.2)
+project(ContactSuite LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+# Precompiled OpenMP library / Use FetchContent module instead
+set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 
-# Default to Release build
-if (NOT CMAKE_BUILD_TYPE)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Release as default
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+            Debug Release RelWithDebInfo MinSizeRel)
 endif ()
 
-# ================== BUILD OPTIONS (switch) ==================
-option(BUILD_STATIC_LIB "Build the static library FastSim" ON)
-option(BUILD_MAIN_EXEC "Build the main executable" ON)
-option(BUILD_TESTS "Build GoogleTest suite" ON)
-
-# Paths
-set(LIBS_PATH "${PROJECT_SOURCE_DIR}/libs")
-set(HEADERS_PATH "${PROJECT_SOURCE_DIR}/headers")
-set(SRC_PATH "${PROJECT_SOURCE_DIR}/src")
-set(TEST_PATH "${PROJECT_SOURCE_DIR}/test")
-
-include_directories(${HEADERS_PATH})
-
-# ====================== STATIC LIBRARY ======================
-if (BUILD_STATIC_LIB)
-    add_library(FastSim_lib STATIC ${SRC_PATH}/fastsim.cpp)
-
-    set_target_properties(FastSim_lib PROPERTIES
-            ARCHIVE_OUTPUT_DIRECTORY ${LIBS_PATH}
-            OUTPUT_NAME "fastsim"
-            EXPORT_NAME FastSim
-    )
-
-    # Install library
-    install(TARGETS FastSim_lib
-            EXPORT FastSimTargets
-            ARCHIVE DESTINATION ${LIBS_PATH}
-    )
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wall -Wextra -Wpedantic -Wconversion)
 endif ()
 
-# ==================== MAIN EXECUTABLE =====================
-if (BUILD_MAIN_EXEC)
-    add_executable(FastSim ${SRC_PATH}/main.cpp)
-    if (BUILD_STATIC_LIB)
-        target_link_libraries(FastSim PRIVATE FastSim_lib)
-    endif ()
+option(BUILD_EQ_CONTACT "Build Eq-Elastic-Norm module" ON)
+option(BUILD_TABCON "Build tabcon module" ON)
+option(BUILD_FASTSIM "Build FastSim module" ON)
+
+if (BUILD_EQ_CONTACT)
+    message(STATUS "Building Equivalent Elastic Normal module...")
+    add_subdirectory(normal_eq_elastic)
 endif ()
 
-# ====================== GOOGLE TESTS ======================
-if (BUILD_TESTS)
-    include(FetchContent)
-    FetchContent_Declare(googletest
-            GIT_REPOSITORY https://github.com/google/googletest
-            GIT_TAG v1.14.0)
-
-    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-
-    FetchContent_MakeAvailable(googletest)
-
-    file(GLOB_RECURSE TEST_SOURCES "${TEST_PATH}/*.cpp")
-    add_executable(FastSimTest ${TEST_SOURCES})
-
-    target_link_libraries(FastSimTest PRIVATE FastSim_lib gtest_main)
-
-    include(GoogleTest)
-    enable_testing()
-    gtest_discover_tests(FastSimTest)
+if (BUILD_TABCON)
+    message(STATUS "Building tabcon module...")
+    add_subdirectory(tang_spin_tabcon)
 endif ()
+
+if (BUILD_FASTSIM)
+    message(STATUS "Building FastSim module...")
+    add_subdirectory(tang_fastsim)
+endif ()
+
+enable_testing()
