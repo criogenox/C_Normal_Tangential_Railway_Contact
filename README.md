@@ -10,9 +10,6 @@
   <p align="center">
     <b>C++ Wheel-Rail Contact Libraries </b>
   </p>
-  <p align="center">
-    Normal Contact Solver, FastSim Algorithm & Kalker's Book of Tables (TABCON)
-  </p>
 </div>
 
 ## About the project
