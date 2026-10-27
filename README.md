@@ -67,7 +67,7 @@ The suite consists of three complementary subprojects:
 > High-performance C++ reader and 4-dimensional interpolator for Kalker's numerical "Book of Tables" (TABCON / con93-format dataset) for rolling contact with spin.
 
 - **Key Capabilities:**
-  - Fast 4D quadrilinear interpolation across contact ellipse ratio ($a/b$), normalized longitudinal creepage ($u_x$), normalized lateral creepage ($u_y$), and normalized spin ($\phi$).
+  - Fast 4D quadrilinear/cubic interpolation across contact ellipse ratio ($a/b$), normalized longitudinal creepage ($u_x$), normalized lateral creepage ($u_y$), and normalized spin ($\phi$).
   - Full symmetry handling (reflections over $x\text{--}z$ and $y\text{--}z$ planes) and monotonic search over folded linear/reciprocal grid branches.
   - Computes normalized longitudinal force ($F_x / \mu N$), lateral force ($F_y / \mu N$), and spin moment ($M_z / \mu N \sqrt{ab}$).
   - Incorporates Kalker's `linrol` algorithm to interpolate the linear rolling contact theory creepage coefficients ($C_{11}, C_{22}, C_{23}, C_{33}$) across arbitrary Poisson ratios $\nu$ and aspect ratios $a/b$.
@@ -135,7 +135,7 @@ The suite consists of three complementary subprojects:
 
 `Multi-Dimensional Interpolation Engine:`
 
-- **4D Quadrilinear Interpolation:** Evaluates forces across $a/b$, longitudinal creepage $u_x$, lateral creepage $u_y$, and spin $\phi$ across 14 aspect-ratio blocks, 256 sub-blocks, and 32 spin entries.
+- **4D Quadrilinear/Cubic Interpolation:** Evaluates forces across $a/b$, longitudinal creepage $u_x$, lateral creepage $u_y$, and spin $\phi$ across 14 aspect-ratio blocks, 256 sub-blocks, and 32 spin entries.
 - **Monotonic Dual-Branch Search:** Efficiently navigates folded linear ($i/7$) and reciprocal ($7/i$) grid branches with symmetry reduction.
 - **Linear Creepage Coefficients (`linrol-like routine`):** Computes linear contact flexibility coefficients ($C_{11}, C_{22}, C_{23}, C_{33}$) across arbitrary Poisson's ratios $\nu$ and aspect ratios $a/b$.
 
@@ -165,17 +165,30 @@ The suite consists of three complementary subprojects:
   <a align="center">
     <img align="center" src="figures/output_tests.png">
   </a>
-  <p align="center">
+   <p align="center" style="color: #00dcff;">
     FastSim-test's full output: execution time, test tagging, and detailed results (especially when it fails)
   </p>
 </div>
+
+---
 
 <div align="center">
   <a align="center">
     <img align="center" src="figures/EEC_console_output.png">
   </a>
-  <p align="center">
+   <p align="center" style="color: #00dcff;">
     Console output of the normal contact solver computation
+  </p>
+</div>
+
+---
+
+<div align="center">
+  <a align="center">
+    <img align="center" src="figures/tabcon_tests.png">
+  </a>
+  <p align="center" style="color:#00dcff;">
+    TABCON interpolation test - quadrilinear vs monotone cubic 
   </p>
 </div>
 

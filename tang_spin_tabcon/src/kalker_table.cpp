@@ -1,10 +1,11 @@
 #include "kalker_table.h"
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
+
 #include <algorithm>
 #include <cmath>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include "string"
 
 namespace {
     /**
@@ -156,13 +157,19 @@ KalkerResult KalkerTable::lookup(const double aob, const double ux, const double
     // Reduce to the stored octant: upsx, upsy >= 0. The mirror relations
     // (reflection about the x-z and y-z planes) map the sign of ux and uy
     // onto the output forces and flip phi (crucially):
-    // Fx = sx * Fx_s ,  Fy = sy * Fy_s ,  Mz = sx*sy * Mz_s
-    // evaluated at ( |ux|, |uy|, phi_eff = sx*sy*phi ).
+    // Fx = sx * Fx_s ,  Fy = sy * Fy_s ,  Mz = sy * Mz_s
+    // evaluated at ( |ux|, |uy|, phi_eff = sy * phi ).
     const double sx = (ux < 0) ? -1.0 : 1.0;
     const double sy = (uy < 0) ? -1.0 : 1.0;
     const double axu = std::abs(ux);
     const double ayu = std::abs(uy);
-    const double phi_eff = sx * sy * phi;
+
+    // ------------------ FIX ------------------
+    // Derived from exact symmetries S1 (mirror-y) and S3 (full negation):
+    // Fy, Mz are even in ux; Fx is odd in ux.
+    // Phi only flips with uy (mirror-y), not ux.
+    const double phi_eff = sy * phi;
+    // ------------------ FIX ------------------
 
     size_t ba = 0, bx = 0, by = 0, bp = 0;
     double wa = 0.0, wx = 0.0, wy = 0.0, wp = 0.0;
@@ -195,8 +202,12 @@ KalkerResult KalkerTable::lookup(const double aob, const double ux, const double
                 }
 
     KalkerResult res{};
-    res.Fx = sx * acc.Fx;
-    res.Fy = sy * acc.Fy;
-    res.Mz = sx * sy * acc.Mz;
+
+    // ------------------ FIX ------------------
+    res.Fx = sx * acc.Fx; // (Fx odd in ux)
+    res.Fy = sy * acc.Fy; // (Fy even in ux)
+    res.Mz = sy * acc.Mz; // (Mz even in ux)
+    // ------------------ FIX ------------------
+
     return res;
 }

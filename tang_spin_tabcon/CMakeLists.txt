@@ -7,13 +7,19 @@ target_include_directories(kalker_table PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-add_executable(tabcon src/main.cpp)
+add_library(kalker_table_cubic src/kalker_table_cubic.cpp)
+
+target_include_directories(kalker_table_cubic PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+add_executable(tabcon src/main_comparison.cpp)
 
 target_include_directories(tabcon PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(tabcon PRIVATE kalker_table)
+target_link_libraries(tabcon PRIVATE kalker_table kalker_table_cubic)
 
 # Ensure tabcon.dat is available in the build directory for testing
 configure_file(tabcon.dat ${CMAKE_CURRENT_BINARY_DIR}/tabcon.dat COPYONLY)
