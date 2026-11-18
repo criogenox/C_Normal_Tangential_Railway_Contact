@@ -209,10 +209,10 @@ Which provide:
 
 ## References & Bibliography
 
-1. <a id="ref-1"></a>**Kalker, J. J. (1982).** *A fast algorithm for the simplified theory of rolling contact*. Vehicle System Dynamics, 11(1), 1–13.
+1. <a id="ref-1"></a>**Kalker, J. J. (1982).** *A fast algorithm for the simplified theory of rolling contact*. Vehicle System Dynamics, Volume 11, Issue 1, Pages 1–13. [DOI:10.1080/00423118208968684](https://doi.org/10.1080/00423118208968684)
 2. <a id="ref-2"></a>**Giossi, Rocco Libero (2025).** *SimRail: a normal contact problem library in python. Implementation solution of the normal contact problem with the equivalent elastic method.*
-3. <a id="ref-3"></a>**Kalker, J. J. (1990).** *Three-Dimensional Elastic Bodies in Rolling Contact*. Solid Mechanics and Its Applications, Vol. 2, Kluwer Academic Publishers, Dordrecht.
-4. <a id="ref-4"></a>**Shabana, A. A. (2009).** *Computational dynamics*. Wiley.
+3. <a id="ref-3"></a>**Kalker, J. J. (1990).** *Three-Dimensional Elastic Bodies in Rolling Contact*. Solid Mechanics and Its Applications, Volume 2, Springer, Dordrecht, ISBN: 9780792307129. [DOI:10.1007/978-94-015-7889-9](https://doi.org/10.1007/978-94-015-7889-9)
+4. <a id="ref-4"></a>**Shabana, A. A. (2009).** *Computational dynamics*. Wiley. [DOI:10.1002/9780470686850](https://doi.org/10.1002/9780470686850)
 
 <!-- LICENSE -->
 
