@@ -12,7 +12,7 @@
   </p>
 </div>
 
-## About the project
+## About the project (**UPDATE IN PROGRESS...**)
 
 <div align="justify">
   <p>
@@ -31,7 +31,15 @@
   </p> 
   </div>
 
----
+## GUI-driven-testing views
+
+| ⬇⬇ **Look-up&nbsp;table&nbsp;generation** ⬇⬇      | ⬇⬇ **Sweep&nbsp;results&nbsp;viewer** ⬇⬇            |
+|:-------------------------------------------------:|:---------------------------------------------------:|
+| ![sample-6](figures/sample6.png)                  | ![sample-3](figures/sample3.png)                    |
+| ⬇⬇ **FastSim&nbsp;GTest&nbsp;suite** ⬇⬇           | ⬇⬇ **TABCON&nbsp;tests** ⬇⬇                         |
+| ![sample-1](figures/sample1.png)                  | ![sample-2](figures/sample2.png)                    |
+| ⬇⬇ **Raw&nbsp;results&nbsp;table&nbsp;viewer** ⬇⬇ | ⬇⬇ **Normal&nbsp;loop-up&nbsp;table&nbsp;tests** ⬇⬇ |
+| ![sample-4](figures/sample4.png)                  | ![sample-5](figures/sample5.png)                    |
 
 ## Suite Modules & Architecture
 
@@ -75,15 +83,57 @@ The suite consists of three complementary subprojects:
   - **Implementation's Info Source:** Based on Kalker's CONTACT / USETAB table formulation and J. J. Kalker works [[3](#ref-3)].
   - **Table [tabcon.dat](./tang_spin_tabcon/tabcon.dat) Source**: It dates from 2005, older **con93** format, extracted from the companion material for [[4](#ref-4)].
 
----
+### 4. [`Normal look-up table`](./lookup_table) — Precomputed Normal Calculation Table
+
+> Precomputed-once 2D lookup table (`normal_table.dat`) + run-time interpolator, avoiding solving the normal contact problem in real time on every evaluation.
+
+- `lookup_table/src/generate_normal_table.cpp` builds `normal_table.dat`.
+- `lookup_table/src/NormalLookupTable.cpp` - loads/interpolates the table.
+- `lookup_table/src/WheelRailContactTable.cpp` holds `TableContactSolver`, the two-stage solver (normal & tangential solutions) with patch-specific kinematic creepages.
+- `lookup_table/test/example_table.cpp` / `validation_table.cpp` - table-based example and validation (parity vs `sweep_results.csv` from a standalone complete sweep).
+- Adapter for real-time simulations (**COMING SOON...**).
+
+**Speed difference** (same machine, same scenario, per single evaluation):
+
+| solver                   | time per evaluation |
+| ------------------------ | ------------------- |
+| Real-time normal library | ~20k-23k µs         |
+| Normal lookup table             | ~13–22 µs           |
+
+That is roughly **3 orders of magnitude faster**, which is what makes full sweep simulations practical.
+
+### 5. [`GUI`](./gui_qt) - Graphical orchestator
+
+> Useful front-end built with Qt6 Widgets + Qt6 Charts.
+
+Which provide:
+
+- **Run-tools tab** - one button per tool (executables):
+  - Added guard for missing executables, tabulated .csv or .dat loop-up table.
+  - Console output is cleared per run, ANSI color codes are stripped, lines split across process-read chunks are never broken, pass/fail lines are colored, copy-all and auto-scroll toggle are available.
+- **CSV viewer tab** - plots `sweep_results.csv` (auto-reloaded):
+  - X-axis drop-down, multi-select Y series.
+  - Modern integration powered by a [custom Qt Charts library][custom_charts-url] with interactive tracking, zooming and panning view capabilities.
+- **Generate-table tab**: 
+  - Editable parameters fields, run/kill buttons & progress bar.
+  - Dependency gating - targets stay disabled until `normal_table.dat` has successfully produced.
 
 ## Built With
 
 <div style="display: flex; flex-direction: column; align=center">
     <img class="img" src="figures/Cpp_logo.png" alt="Logo" width="90" height="80"/>
     <img class="img" src="figures/CMake_logo.png" alt="Logo" width="90" height="80"/>
+    <img class="img" src="figures/Qt_logo.png" alt="Logo" width="100" height="100"/>
     <img class="img" src="figures/CLion_logo.png" alt="Logo" width="90" height="90"/>
 </div>
+
+### Build notes
+
+- Dependency (GTest) come from **vcpkg** (`vcpkg.json` manifest; toolchain resolved in the root `CMakeLists.txt` via `$VCPKG_ROOT`).
+- OpenMP is taken from the system (native Linux).
+- Qt gui: configure with `-DCMAKE_PREFIX_PATH=/path/to/Qt/6.10.3/gcc_64 -DBUILD_GUI_QT=ON`.
+- Runtime-produced files (`normal_table.dat`, `sweep_results.csv`) are copied to the source data folders **by the tools themselves at the end of their `main()`**. 
+- CMake `POST_BUILD` steps only copy files that already exist in the source tree (`S1002.txt`, `UIC60.txt`, `tabcon.dat`).
 
 ### Additional info
 
@@ -151,48 +201,11 @@ The suite consists of three complementary subprojects:
 - `BUILD_TABCON`: Enables the TABCON table interpolator module.
 
 - `BUILD_FASTSIM`: Enables the FastSim tangential solver and GoogleTest suite.
-  
+
+- `BUILD_GUI_QT`: Enables user graphical interface creation.
+
   </p>
   </div>
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
----
-
-## Output view samples
-
-<div align="center">
-  <a align="center">
-    <img align="center" src="figures/output_tests.png">
-  </a>
-   <p align="center" style="color: #00dcff;">
-    FastSim-test's full output: execution time, test tagging, and detailed results (especially when it fails)
-  </p>
-</div>
-
----
-
-<div align="center">
-  <a align="center">
-    <img align="center" src="figures/EEC_console_output.png">
-  </a>
-   <p align="center" style="color: #00dcff;">
-    Console output of the normal contact solver computation
-  </p>
-</div>
-
----
-
-<div align="center">
-  <a align="center">
-    <img align="center" src="figures/tabcon_tests.png">
-  </a>
-  <p align="center" style="color:#00dcff;">
-    TABCON interpolation test - quadrilinear vs monotone cubic 
-  </p>
-</div>
-
----
 
 ## References & Bibliography
 
@@ -200,8 +213,6 @@ The suite consists of three complementary subprojects:
 2. <a id="ref-2"></a>**Giossi, Rocco Libero (2025).** *SimRail: a normal contact problem library in python. Implementation solution of the normal contact problem with the equivalent elastic method.*
 3. <a id="ref-3"></a>**Kalker, J. J. (1990).** *Three-Dimensional Elastic Bodies in Rolling Contact*. Solid Mechanics and Its Applications, Vol. 2, Kluwer Academic Publishers, Dordrecht.
 4. <a id="ref-4"></a>**Shabana, A. A. (2009).** *Computational dynamics*. Wiley.
-
----
 
 <!-- LICENSE -->
 
@@ -216,3 +227,4 @@ Distributed under the MIT License. See [LICENSE.txt][license-url] for more infor
 [linkedin-shield]: figures/LinkedIn_logo_small.png
 [linkedin-url]: https://www.linkedin.com/in/criogenox/
 [license-url]: https://github.com/criogenox/C_Normal_Tangential_Railway_Contact?tab=MIT-1-ov-file
+[custom_charts-url]: https://github.com/criogenox/Custom-Zooming-and-Tracking-for-Charts-using-Pure-Qt
